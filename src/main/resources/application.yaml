@@ -1,3 +1,13 @@
 spring:
   application:
     name: servicepayment
+
+
+  cloud:
+    function:
+      definition: fraudTransactionConsumer
+
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092

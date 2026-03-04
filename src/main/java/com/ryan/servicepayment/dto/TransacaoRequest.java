@@ -1,4 +1,4 @@
-package com.ryan.servicepayment.model.dto;
+package com.ryan.servicepayment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
