@@ -1,14 +1,16 @@
 package com.ryan.servicepayment.dto;
 
+import com.ryan.servicepayment.enums.TipoTransacao;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public record TransacaoRequest(
-        @NotBlank(message = "ID da conta obrigatorio") String contaId,
-        @NotBlank(message = "ID do cartao obrigatorio") String cartaoId,
-        @NotNull(message = "Valor obrigatorio") BigDecimal valor,
-        @NotBlank(message = "Comerciante obrigatorio") String comerciante,
+        String contaId,
+        String cartaoId,
+        BigDecimal valor,
+        TipoTransacao transacao,
+        String comerciante,
         String localizacao
 ) {}
