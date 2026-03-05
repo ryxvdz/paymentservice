@@ -18,8 +18,6 @@ public class Transacao {
 
     private TipoTransacao tipoTransacao;
 
-    private Cartao cartao;
-
     private BigDecimal valor;
 
     private String comerciante;

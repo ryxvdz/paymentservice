@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @UtilityClass
 public class ContaBalanceFactory {
 
-    public ContaBalance settarSaldo(TransacaoRequest transacaoRequest, BigDecimal saldo, BigDecimal limite){
+    public static ContaBalance settarSaldo(TransacaoRequest transacaoRequest, BigDecimal saldo, BigDecimal limite){
 
         return ContaBalance.builder()
                 .contaId(transacaoRequest.contaId())
