@@ -15,7 +15,10 @@ spring:
         binder:
           brokers: localhost:9092
 
-    topics:
-      transacao-aprovada: "transacao-aprovada-topic"
-      transacao-reprovada: "transacao-aprovada-topic"
+    bindings:
+      transacaoAprovada-out-0:
+        destination: transacao-aprovada-topic
+
+      transacaoReprovada-out-0:
+        destination: transacao-reprovada-topic
 

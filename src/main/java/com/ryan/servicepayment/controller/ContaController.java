@@ -35,4 +35,9 @@ public class ContaController {
         return contaService.buscarPorCpf(cpf);
     }
 
+
+    @DeleteMapping
+    public void deletarConta(String id){
+        contaService.deletarConta(id);
+    }
 }

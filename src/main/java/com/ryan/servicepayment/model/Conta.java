@@ -16,6 +16,6 @@ public class Conta {
     private String nomeCompleto;
     private String cpf;
     private String cartao;
-    private BigDecimal saldoInicial;
-    private BigDecimal limiteInicial;
+    private BigDecimal saldoAtual;
+    private BigDecimal limiteAtual;
 }

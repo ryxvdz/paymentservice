@@ -28,8 +28,8 @@ public class ContaService {
         conta.setId(UUID.randomUUID().toString());
         conta.setNomeCompleto(contaRequest.nomeCompleto());
         conta.setCpf(contaRequest.CPF());
-        conta.setSaldoInicial(contaRequest.saldoInicial());
-        conta.setLimiteInicial(contaRequest.limiteInicial());
+        conta.setSaldoAtual(contaRequest.saldoInicial());
+        conta.setLimiteAtual(contaRequest.limiteInicial());
         conta.setCartao(UUID.randomUUID().toString());
 
         Conta contaSalva = contaRepository.save(conta);
@@ -54,5 +54,10 @@ public class ContaService {
     return (Conta) contaRepository.findByCpf(cpf);
     }
 
+
+    public void deletarConta(String id){
+        contaRepository.deleteById(id);
+        redisTemplate.delete(BALANCEAMENTO_KEY_PREFIX + id);
+    }
 
 }

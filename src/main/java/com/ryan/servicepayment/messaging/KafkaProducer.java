@@ -23,7 +23,7 @@ public class KafkaProducer {
     public void envioTransacaoAprovada(Transacao transacao){
         try {
             String message = objectMapper.writeValueAsString(transacao);
-            streamBridge.send("spring.cloud.topics.trasancao-aprovada", message);
+            streamBridge.send("transacaoAprovada-out-0", message);
             log.info("Transação Aprovada com sucesso: {}", transacao.getId());
         }catch (RuntimeException e){
 
@@ -31,11 +31,11 @@ public class KafkaProducer {
         }
     }
 
-    public void envioTransacaoRecusada(TransacaoRequest transacaoRequest){
+    public void envioTransacaoRecusada(Transacao transacao){
         try {
-            String message = objectMapper.writeValueAsString(transacaoRequest);
-            streamBridge.send("spring.cloud.topics.trasancao-reprovada", message);
-            log.info("Transação recusada: {}");
+            String message = objectMapper.writeValueAsString(transacao);
+            streamBridge.send("transacaoReprovada-out-0", message);
+            log.info("Transação recusada: {}", transacao.getId());
         }catch (RuntimeException e){
 
             log.error("Erro ao enviar mensagem para topico.", e);

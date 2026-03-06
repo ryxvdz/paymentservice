@@ -2,16 +2,15 @@ package com.ryan.servicepayment.services;
 
 import com.ryan.servicepayment.dto.ContaBalance;
 import com.ryan.servicepayment.dto.TransacaoRequest;
-import com.ryan.servicepayment.enums.TipoTransacao;
-import com.ryan.servicepayment.messaging.KafkaProducer;
+import com.ryan.servicepayment.model.Conta;
 import com.ryan.servicepayment.model.Transacao;
-import com.ryan.servicepayment.repository.TransacaoRepository;
+import com.ryan.servicepayment.repository.ContaRepository;
+import com.ryan.servicepayment.strategy.TransacaoStrategy;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Map;
 
 import static com.ryan.servicepayment.factory.ContaBalanceFactory.settarSaldo;
 
@@ -20,67 +19,38 @@ import static com.ryan.servicepayment.factory.ContaBalanceFactory.settarSaldo;
 @Service
 public class TransacaoService {
 
-    private final TransacaoRepository transacaoRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final KafkaProducer kafkaProducer;
+    private final ContaRepository contaRepository;
 
     private static final String BALANCEAMENTO_KEY_PREFIX = "balanceamento";
 
+    private final Map<String, TransacaoStrategy> estrategias;
 
     public Transacao processoTransacao(TransacaoRequest transacaoRequest) {
+
         String redisKey = BALANCEAMENTO_KEY_PREFIX + transacaoRequest.contaId();
+        Conta conta = contaRepository.findById(transacaoRequest.contaId())
+                .orElseThrow(() -> new RuntimeException("Conta nao encontrada"));
+
+
         ContaBalance contaBalance = (ContaBalance) redisTemplate.opsForValue().get(redisKey);
-
         if (contaBalance == null) {
-            contaBalance = settarSaldo(transacaoRequest, BigDecimal.ZERO, BigDecimal.ZERO);
+            contaBalance = settarSaldo(transacaoRequest, conta.getSaldoAtual(), conta.getLimiteAtual());
         }
 
+        TransacaoStrategy strategy = estrategias.get(transacaoRequest.transacao().name());
 
-        BigDecimal saldoAtual = contaBalance.getSaldoEmConta();
-        BigDecimal limiteAtual = contaBalance.getLimiteEmConta();
-        BigDecimal valorDaTransacao = transacaoRequest.valor();
-
-        BigDecimal novoSaldo = saldoAtual;
-        BigDecimal novoLimite = limiteAtual;
-
-
-        if (transacaoRequest.transacao() == TipoTransacao.DEBITO) {
-            if (saldoAtual.compareTo(valorDaTransacao) < 0) {
-                kafkaProducer.envioTransacaoRecusada(transacaoRequest);
-                throw new RuntimeException("Saldo Insuficiente!");
-            }
-            novoSaldo = saldoAtual.subtract(valorDaTransacao);
-
-
-
-        } else if (transacaoRequest.transacao() == TipoTransacao.CREDITO) {
-            if (limiteAtual.compareTo(valorDaTransacao) < 0) {
-                kafkaProducer.envioTransacaoRecusada(transacaoRequest);
-                throw new RuntimeException("Limite Insuficiente!");
-
-            }
-            novoLimite = limiteAtual.subtract(valorDaTransacao);
-
-
-        } else {
-            throw new IllegalArgumentException("Tipo de transição inválida.");
+        if(strategy ==null){
+            throw new IllegalArgumentException("Tipo de transação desconhecida: " + transacaoRequest.transacao());
         }
 
-        ContaBalance novoBalance = settarSaldo(transacaoRequest, novoSaldo, novoLimite);
-        redisTemplate.opsForValue().set(redisKey, novoBalance);
-
-        Transacao transacao = new Transacao();
-
-        transacao.setValor(transacaoRequest.valor());
-        transacao.setTipoTransacao(transacaoRequest.transacao());
-        transacao.setLocalizacao(transacaoRequest.localizacao());
-        transacao.setDataHota(LocalDateTime.now());
-        transacao.setComerciante(transacaoRequest.comerciante());
-
-        kafkaProducer.envioTransacaoAprovada(transacao);
+        Transacao transacao = strategy.processar(transacaoRequest, conta,contaBalance);
 
 
-        return transacaoRepository.save(transacao);
+        redisTemplate.opsForValue().set(redisKey,contaBalance);
+
+        return transacao;
+
     }
 
 
