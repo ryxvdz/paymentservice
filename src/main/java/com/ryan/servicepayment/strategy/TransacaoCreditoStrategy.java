@@ -36,7 +36,6 @@ public class TransacaoCreditoStrategy implements TransacaoStrategy{
 
             transacaoRecusada.setConta(conta);
             transacaoRecusada.setValor(transacaoRequest.valor());
-            transacaoRecusada.setId(UUID.randomUUID().toString());
             transacaoRecusada.setTipoTransacao(transacaoRequest.transacao());
             transacaoRecusada.setLocalizacao(transacaoRequest.localizacao());
             transacaoRecusada.setDataHota(LocalDateTime.now());
@@ -46,14 +45,17 @@ public class TransacaoCreditoStrategy implements TransacaoStrategy{
             transacaoRepository.save(transacaoRecusada);
             kafkaProducer.envioTransacaoRecusada(transacaoRecusada);
 
-            throw new RuntimeException("Limite Insuficiente!");
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Saldo insuficiente"
+            );
         }
 
         contaBalance.setLimiteEmConta(limiteAtual.subtract(valorDaTransacao));
 
         Transacao transacaoAprovada = new Transacao();
 
-        transacaoAprovada.setId(UUID.randomUUID().toString());
+
         transacaoAprovada.setConta(conta);
         transacaoAprovada.setValor(valorDaTransacao);
         transacaoAprovada.setTipoTransacao(transacaoRequest.transacao());

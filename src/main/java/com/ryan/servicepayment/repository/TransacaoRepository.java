@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface TransacaoRepository extends MongoRepository<Transacao, String> {
 
-    List<Transacao> findByContaId(String contaId);
+    List<Transacao> findByContaId(String id);
 
 }

@@ -19,7 +19,7 @@ public class ContaController {
     private final ContaService contaService;
 
 
-    @PostMapping("/criar-Conta")
+    @PostMapping("/criar-conta")
     public Conta criarConta(@RequestBody ContaRequest contaRequest) {
         return contaService.criarConta(contaRequest);
     }

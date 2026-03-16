@@ -24,8 +24,6 @@ public class ContaService {
 
     public Conta criarConta(ContaRequest contaRequest){
         Conta conta = new Conta();
-
-        conta.setId(UUID.randomUUID().toString());
         conta.setNomeCompleto(contaRequest.nomeCompleto());
         conta.setCpf(contaRequest.CPF());
         conta.setSaldoAtual(contaRequest.saldoInicial());

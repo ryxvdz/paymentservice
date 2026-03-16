@@ -33,10 +33,10 @@ public class TransacaoDebitoStrategy implements TransacaoStrategy{
             Transacao transacaoRecusada = new Transacao();
 
             transacaoRecusada.setConta(conta);
-            transacaoRecusada.setId(UUID.randomUUID().toString());
             transacaoRecusada.setTipoTransacao(transacaoRequest.transacao());
             transacaoRecusada.setLocalizacao(transacaoRequest.localizacao());
             transacaoRecusada.setDataHota(LocalDateTime.now());
+            transacaoRecusada.setValor(transacaoRequest.valor());
             transacaoRecusada.setStatusDoPagamento(StatusDoPagamento.RECUSADO);
             transacaoRecusada.setComerciante(transacaoRequest.comerciante());
 
@@ -44,7 +44,10 @@ public class TransacaoDebitoStrategy implements TransacaoStrategy{
 
             kafkaProducer.envioTransacaoRecusada(transacaoRecusada);
 
-            throw new RuntimeException("Saldo Insuficiente!");
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Saldo insuficiente"
+            );
         }
 
         contaBalance.setSaldoEmConta(saldoAtual.subtract(valorTransacao));
@@ -52,7 +55,6 @@ public class TransacaoDebitoStrategy implements TransacaoStrategy{
         Transacao transacaoAprovada = new Transacao();
 
         transacaoAprovada.setConta(conta);
-        transacaoAprovada.setId(UUID.randomUUID().toString());
         transacaoAprovada.setValor(transacaoRequest.valor());
         transacaoAprovada.setTipoTransacao(transacaoRequest.transacao());
         transacaoAprovada.setLocalizacao(transacaoRequest.localizacao());
