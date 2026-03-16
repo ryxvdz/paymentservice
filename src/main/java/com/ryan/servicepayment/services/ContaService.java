@@ -49,7 +49,8 @@ public class ContaService {
 
     public Conta buscarPorCpf(String cpf){
 
-    return (Conta) contaRepository.findByCpf(cpf);
+        List<Conta> contas = contaRepository.findByCpf(cpf);
+        return contas.isEmpty() ? null : contas.get(0);
     }
 
 
