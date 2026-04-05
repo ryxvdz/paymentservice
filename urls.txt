@@ -1,0 +1,7 @@
+service payment = port 8081 http://localhost:8081/swagger-ui/index.html#/
+
+post-camunda-service = port 8087 http://localhost:8087/camunda/app/cockpit/default/
+
+fatura-service = port 8085 http://localhost:8085/swagger-ui/index.html#/
+
+notificacao-service = port 8084

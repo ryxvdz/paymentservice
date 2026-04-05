@@ -3,6 +3,8 @@ package com.ryan.servicepayment.services;
 import com.ryan.servicepayment.dto.ContaBalance;
 import com.ryan.servicepayment.dto.TransacaoRequest;
 import com.ryan.servicepayment.dto.TransacaoResponse;
+import com.ryan.servicepayment.exeption.ContaNaoEncontradaException;
+import com.ryan.servicepayment.exeption.TipoTransacaoInvalidaException;
 import com.ryan.servicepayment.mapper.TransacaoMapper;
 import com.ryan.servicepayment.model.Conta;
 import com.ryan.servicepayment.model.Transacao;
@@ -35,7 +37,7 @@ public class TransacaoService {
 
         String redisKey = BALANCEAMENTO_KEY_PREFIX + transacaoRequest.contaId();
         Conta conta = contaRepository.findById(transacaoRequest.contaId())
-                .orElseThrow(() -> new RuntimeException("Conta nao encontrada"));
+                .orElseThrow(() -> new ContaNaoEncontradaException("Conta não encontrada para o ID: " + transacaoRequest.contaId()));
 
 
         ContaBalance contaBalance = (ContaBalance) redisTemplate.opsForValue().get(redisKey);
@@ -46,7 +48,7 @@ public class TransacaoService {
         TransacaoStrategy strategy = estrategias.get(transacaoRequest.transacao().name());
 
         if(strategy ==null){
-            throw new IllegalArgumentException("Tipo de transação desconhecida: " + transacaoRequest.transacao());
+            throw new TipoTransacaoInvalidaException("Tipo de transação desconhecida: " + transacaoRequest.transacao());
         }
 
         Transacao transacao = strategy.processar(transacaoRequest, conta,contaBalance);

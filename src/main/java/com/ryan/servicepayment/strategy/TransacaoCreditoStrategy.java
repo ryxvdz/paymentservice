@@ -3,6 +3,7 @@ package com.ryan.servicepayment.strategy;
 import com.ryan.servicepayment.dto.ContaBalance;
 import com.ryan.servicepayment.dto.TransacaoRequest;
 import com.ryan.servicepayment.enums.StatusDoPagamento;
+import com.ryan.servicepayment.exeption.SaldoInsuficienteException;
 import com.ryan.servicepayment.messaging.KafkaProducer;
 import com.ryan.servicepayment.model.Conta;
 import com.ryan.servicepayment.model.Transacao;
@@ -45,10 +46,7 @@ public class TransacaoCreditoStrategy implements TransacaoStrategy{
             transacaoRepository.save(transacaoRecusada);
             kafkaProducer.envioTransacaoRecusada(transacaoRecusada);
 
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Saldo insuficiente"
-            );
+            throw new SaldoInsuficienteException("Pagamento recusado: Saldo ou limite insuficiente.");
         }
 
         contaBalance.setLimiteEmConta(limiteAtual.subtract(valorDaTransacao));
