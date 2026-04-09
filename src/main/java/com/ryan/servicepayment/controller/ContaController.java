@@ -4,6 +4,7 @@ package com.ryan.servicepayment.controller;
 import com.ryan.servicepayment.dto.ContaRequest;
 import com.ryan.servicepayment.model.Conta;
 import com.ryan.servicepayment.services.ContaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ContaController {
 
 
     @PostMapping("/criar-conta")
-    public Conta criarConta(@RequestBody ContaRequest contaRequest) {
+    public Conta criarConta(@RequestBody @Valid ContaRequest contaRequest) {
         return contaService.criarConta(contaRequest);
     }
 

@@ -65,4 +65,22 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
+
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErroResponse> handleValidacaoDeCampos(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+
+        String mensagemDeErro = ex.getBindingResult().getFieldErrors().stream()
+                .map(erro -> erro.getDefaultMessage())
+                .collect(java.util.stream.Collectors.joining(" | "));
+
+        ErroResponse erro = new ErroResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                mensagemDeErro
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
 }

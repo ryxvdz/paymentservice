@@ -5,6 +5,7 @@ import com.ryan.servicepayment.dto.TransacaoRequest;
 import com.ryan.servicepayment.dto.TransacaoResponse;
 import com.ryan.servicepayment.model.Transacao;
 import com.ryan.servicepayment.services.TransacaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class TransacaoController {
 
 
     @PostMapping("criar-transacao")
-    public Transacao criarTransacao(@RequestBody TransacaoRequest transacaoRequest){
+    public Transacao criarTransacao(@RequestBody @Valid TransacaoRequest transacaoRequest){
 
         return transacaoService.processoTransacao(transacaoRequest);
     }
